@@ -3,11 +3,11 @@
 #include <opencv2/opencv.hpp>
 #include <stdio.h>
 
-void tic(double &t) { t = (double)cv::getTickCount(); };
+void tic(double &t) { t = (double)cv::getTickCount(); }
 
 double toc(double &t) {
   return ((double)cv::getTickCount() - t) / cv::getTickFrequency();
-};
+}
 
 int main(int argc, char **argv) {
   if (argc != 2) {

@@ -184,7 +184,8 @@ double FilmDosimetryOptimization::diffCalibrationEquation(
 */
 double FilmDosimetryOptimization::objectiveFunction(
     const double &dz, const cv::Vec3d &od, const std::vector<int> &eqt,
-    const std::vector<double> &pol) {
+    const std::vector<double> &pr, const std::vector<double> &pg,
+    const std::vector<double> &pb) {
   /*
    * Helper Derivative of Objective function to find equation roots
    * Function minimum is where derivative equals 0.;
@@ -196,9 +197,9 @@ double FilmDosimetryOptimization::objectiveFunction(
   double odb = od[2] * dz;
 
   // getting polinomial coefficients
-  std::vector<double> pr = {pol[0], pol[1], pol[2]};
-  std::vector<double> pg = {pol[3], pol[4], pol[5]};
-  std::vector<double> pb = {pol[6], pol[7], pol[8]};
+  //  std::vector<double> pr = {pol[0], pol[1], pol[2]};
+  //  std::vector<double> pg = {pol[3], pol[4], pol[5]};
+  //  std::vector<double> pb = {pol[6], pol[7], pol[8]};
 
   // getting doses
   auto Dr = inverseEquation(odr, eqt[0], pr);
@@ -255,7 +256,11 @@ void FilmDosimetryOptimization::optimizeDosimetry() {
           ref. htps://en.wikipedia.org/wiki/Brent%27s_method
 
   */
-  double eps = 2.2204460492503131e-16;
+  double tol = 2.2204460492503131e-16;
+  // getting polinomial coefficients
+  std::vector<double> pr = {m_pol[0], m_pol[1], m_pol[2]};
+  std::vector<double> pg = {m_pol[3], m_pol[4], m_pol[5]};
+  std::vector<double> pb = {m_pol[6], m_pol[7], m_pol[8]};
 
   int nRows = m_image.size[0];
   int nCols = m_image.size[1];
@@ -264,7 +269,7 @@ void FilmDosimetryOptimization::optimizeDosimetry() {
 
       double x = 1.0;
       auto intensity = m_image_od.at<cv::Vec3d>(i, j);
-      auto fx = objectiveFunction(x, intensity, m_eqt, m_pol);
+      auto fx = objectiveFunction(x, intensity, m_eqt, pr, pg, pb);
       if (cmpf(fx, 0.)) {
         m_Emap.at<double>(i, j) = x;
       } else {
@@ -282,13 +287,13 @@ void FilmDosimetryOptimization::optimizeDosimetry() {
           # break*/
           dx *= twosqrt;
           a = x - dx;
-          fa = objectiveFunction(a, intensity, m_eqt, m_pol);
+          fa = objectiveFunction(a, intensity, m_eqt, pr, pg, pb);
 
           if (fa > 0. != fb > 0.) { // check for different sign
             break;
           }
           b = x + dx;
-          fb = objectiveFunction(b, intensity, m_eqt, m_pol);
+          fb = objectiveFunction(b, intensity, m_eqt, pr, pg, pb);
         }
 
         auto fc = fb;
@@ -318,7 +323,6 @@ void FilmDosimetryOptimization::optimizeDosimetry() {
           }
 
           // Convergence test and possible exit
-          auto tol = eps;
           auto m = 0.5 * (c - b);
           auto tbb = std::fabs(b);
           auto toler = 2.0 * tol * std::max(tbb, 1.0);
@@ -382,7 +386,7 @@ void FilmDosimetryOptimization::optimizeDosimetry() {
           } else {
             b = b + toler;
           }
-          fb = objectiveFunction(b, intensity, m_eqt, m_pol);
+          fb = objectiveFunction(b, intensity, m_eqt, pr, pg, pb);
         }
         m_Emap.at<double>(i, j) = b;
       }

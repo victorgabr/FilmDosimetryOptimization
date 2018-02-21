@@ -79,7 +79,9 @@ private:
   */
   double objectiveFunction(const double &dz, const cv::Vec3d &od,
                            const std::vector<int> &eqt,
-                           const std::vector<double> &pol);
+                           const std::vector<double> &pr,
+                           const std::vector<double> &pg,
+                           const std::vector<double> &pb);
   /*
    Derivative from Robust objective function on robust multi-channel
   optimization
