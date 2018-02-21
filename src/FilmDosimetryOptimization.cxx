@@ -246,7 +246,9 @@ double FilmDosimetryOptimization::objectiveFunction(
         ref. htps://en.wikipedia.org/wiki/Brent%27s_method
 
 */
-void FilmDosimetryOptimization::optimizeDosimetry() {
+void FilmDosimetryOptimization::optimizeDosimetry(
+    const std::vector<double> pr, const std::vector<double> pg,
+    const std::vector<double> pb) {
   /*
       Zeroin equation solver - finds zeros of nonlinear equations with no
      derivatives
@@ -258,10 +260,6 @@ void FilmDosimetryOptimization::optimizeDosimetry() {
   */
   double tol = 2.2204460492503131e-16;
   // getting polinomial coefficients
-  std::vector<double> pr = {m_pol[0], m_pol[1], m_pol[2]};
-  std::vector<double> pg = {m_pol[3], m_pol[4], m_pol[5]};
-  std::vector<double> pb = {m_pol[6], m_pol[7], m_pol[8]};
-
   int nRows = m_image.size[0];
   int nCols = m_image.size[1];
   for (int i = 0; i < nRows; i++) {   // y
@@ -409,7 +407,7 @@ void FilmDosimetryOptimization::calcOptimizedDoseRGB() {
   std::vector<double> pb = {m_pol[6], m_pol[7], m_pol[8]};
 
   // calculate disturbance map
-  optimizeDosimetry();
+  optimizeDosimetry(pr, pg, pb);
 
   // calculate optimized dose pixel by pixel
   int nRows = m_image_od.size[0];

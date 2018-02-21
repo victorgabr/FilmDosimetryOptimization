@@ -98,7 +98,9 @@ private:
   :return: function eval
   */
 
-  void optimizeDosimetry();
+  void optimizeDosimetry(const std::vector<double> pr,
+                         const std::vector<double> pg,
+                         const std::vector<double> pb);
   /*
       Zeroin equation solver - finds zeros of nonlinear equations with no
 
